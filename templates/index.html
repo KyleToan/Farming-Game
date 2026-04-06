@@ -1,2 +1,56 @@
 <!DOCTYPE html>
-<html><body>ok</body></html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harvest Valley</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <!-- Fixed header: money counter + passive income rate -->
+    <header id="header">
+        <div id="money-display">💰 <span id="money-counter">$0</span></div>
+        <div id="income-display">🌾 <span id="income-counter">$0/sec</span></div>
+        <div id="prestige-display" style="display:none">⭐ Prestige: <span id="prestige-count">0</span></div>
+    </header>
+
+    <!-- Main game area: harvest panel (left) + shop sidebar (right) -->
+    <div id="game-container">
+
+        <!-- Left: harvest button + rebirth button -->
+        <div id="harvest-panel">
+            <div id="harvest-btn-wrapper">
+                <button id="harvest-btn" onclick="handleHarvest(event)">🌾</button>
+                <p id="click-value-display">+$1 / click</p>
+            </div>
+            <button id="rebirth-btn" onclick="confirmPrestige()" style="display:none">
+                ✨ Rebirth
+            </button>
+        </div>
+
+        <!-- Right: scrollable shop sidebar -->
+        <div id="shop-sidebar">
+            <div class="shop-section">
+                <h2 class="shop-title">🚜 Passive Upgrades</h2>
+                <div id="passive-upgrades-list"></div>
+            </div>
+            <hr class="shop-divider">
+            <div class="shop-section">
+                <h2 class="shop-title">🏆 Milestones</h2>
+                <div id="milestone-upgrades-list"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts loaded in dependency order -->
+    <script src="{{ url_for('static', filename='upgrades.js') }}"></script>
+    <script src="{{ url_for('static', filename='prestige.js') }}"></script>
+    <script src="{{ url_for('static', filename='save.js') }}"></script>
+    <script src="{{ url_for('static', filename='game.js') }}"></script>
+
+</body>
+</html>
