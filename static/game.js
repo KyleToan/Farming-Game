@@ -1,5 +1,5 @@
 // game.js — core game loop for Harvest Valley
-// Load order: upgrades.js → prestige.js → save.js → game.js
+// Load order: upgrades.js → prestige.js → save.js → animals.js → game.js
 
 // ── Game state ────────────────────────────────────────────────────────────
 const gameState = {
@@ -9,9 +9,17 @@ const gameState = {
     moneyPerClick: 1,
     moneyPerSecond: 0,
     productionMultiplier: 1,
+    clickMultiplier: 1,
+    passiveIncomeMultiplier: 1,
+    costMultiplier: 1,
+    passiveTickMultiplier: 1,
+    upgradeProductionMultipliers: {},
     prestigeCount: 0,
     prestigeMultiplier: 1,
     ownedUpgrades: {},
+    ownedAnimals: {},
+    animalMilestoneMult: {},
+    animalHousingLevel: 0,
     purchasedMilestones: []
 };
 
@@ -26,9 +34,14 @@ function formatMoney(amount) {
 
 // ── Harvest click handler ─────────────────────────────────────────────────
 function handleHarvest(event) {
+    const animalClick = (typeof getAnimalClickMult === 'function') ? getAnimalClickMult() : 1;
+    const animalGlobal = (typeof getAnimalGlobalMult === 'function') ? getAnimalGlobalMult() : 1;
     const earned = gameState.moneyPerClick
+                 * gameState.clickMultiplier
                  * gameState.productionMultiplier
-                 * gameState.prestigeMultiplier;
+                 * gameState.prestigeMultiplier
+                 * animalClick
+                 * animalGlobal;
 
     gameState.playerMoney    += earned;
     gameState.totalEarned    += earned;
@@ -61,9 +74,17 @@ function spawnFloatingText(x, y, text) {
 // Runs every 1000ms. Adds one second of passive income.
 function passiveTick() {
     if (gameState.moneyPerSecond === 0) return;
+    const animalPassive = (typeof getAnimalPassiveIncomeMult === 'function') ? getAnimalPassiveIncomeMult() : 1;
+    const animalGlobal = (typeof getAnimalGlobalMult === 'function') ? getAnimalGlobalMult() : 1;
+    const animalTick = (typeof getAnimalTickMult === 'function') ? getAnimalTickMult() : 1;
     const earned = gameState.moneyPerSecond
+                 * gameState.passiveIncomeMultiplier
                  * gameState.productionMultiplier
-                 * gameState.prestigeMultiplier;
+                 * gameState.prestigeMultiplier
+                 * gameState.passiveTickMultiplier
+                 * animalPassive
+                 * animalGlobal
+                 * animalTick;
     gameState.playerMoney += earned;
     gameState.totalEarned += earned;
     updateDisplay();
@@ -75,15 +96,27 @@ function updateDisplay() {
     // Header counters
     document.getElementById('money-counter').textContent = formatMoney(gameState.playerMoney);
 
+    const animalPassive = (typeof getAnimalPassiveIncomeMult === 'function') ? getAnimalPassiveIncomeMult() : 1;
+    const animalGlobal = (typeof getAnimalGlobalMult === 'function') ? getAnimalGlobalMult() : 1;
+    const animalTick = (typeof getAnimalTickMult === 'function') ? getAnimalTickMult() : 1;
+    const animalClick = (typeof getAnimalClickMult === 'function') ? getAnimalClickMult() : 1;
     const effectiveMps = gameState.moneyPerSecond
+                       * gameState.passiveIncomeMultiplier
                        * gameState.productionMultiplier
-                       * gameState.prestigeMultiplier;
+                       * gameState.prestigeMultiplier
+                       * gameState.passiveTickMultiplier
+                       * animalPassive
+                       * animalGlobal
+                       * animalTick;
     document.getElementById('income-counter').textContent = formatMoney(effectiveMps) + '/sec';
 
     // Click value label under harvest button
     const effectiveClick = gameState.moneyPerClick
+                         * gameState.clickMultiplier
                          * gameState.productionMultiplier
-                         * gameState.prestigeMultiplier;
+                         * gameState.prestigeMultiplier
+                         * animalClick
+                         * animalGlobal;
     document.getElementById('click-value-display').textContent =
         '+' + formatMoney(effectiveClick) + ' / click';
 
@@ -96,6 +129,10 @@ function updateDisplay() {
         prestigeDisplay.style.display = 'none';
     }
 
+    // Stats bar
+    document.getElementById('total-earned-display').textContent = formatMoney(gameState.totalEarned);
+    document.getElementById('click-count-display').textContent = gameState.totalClickCount.toLocaleString();
+
     // Rebirth button visibility (prestige.js)
     updateRebirthButton();
 
@@ -106,6 +143,7 @@ function updateDisplay() {
 // ── Page load sequence ────────────────────────────────────────────────────
 window.addEventListener('load', () => {
     loadGame();                   // restore state from localStorage
+    if (typeof ensureAnimalHousingFits === 'function') ensureAnimalHousingFits(gameState);
     recalculatePassiveIncome();   // rebuild moneyPerSecond from owned upgrades
     updateDisplay();              // render everything
 

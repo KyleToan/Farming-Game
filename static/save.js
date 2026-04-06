@@ -11,9 +11,17 @@ const DEFAULT_STATE = {
     moneyPerClick: 1,
     moneyPerSecond: 0,
     productionMultiplier: 1,
+    clickMultiplier: 1,
+    passiveIncomeMultiplier: 1,
+    costMultiplier: 1,
+    passiveTickMultiplier: 1,
+    upgradeProductionMultipliers: {},
     prestigeCount: 0,
     prestigeMultiplier: 1,
     ownedUpgrades: {},
+    ownedAnimals: {},
+    animalMilestoneMult: {},
+    animalHousingLevel: 0,
     purchasedMilestones: []
 };
 

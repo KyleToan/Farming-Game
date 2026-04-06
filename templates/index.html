@@ -5,34 +5,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Harvest Valley</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-    <!-- Fixed header: money counter + passive income rate -->
+    <!-- Fixed header: money | title | income + rebirth -->
     <header id="header">
         <div id="money-display">💰 <span id="money-counter">$0</span></div>
-        <div id="income-display">🌾 <span id="income-counter">$0/sec</span></div>
-        <div id="prestige-display" style="display:none">⭐ Prestige: <span id="prestige-count">0</span></div>
+        <div id="header-center">
+            <div id="game-title">🌾 Harvest Valley</div>
+            <div id="prestige-display" style="display:none">⭐ <span id="prestige-count">0</span> Prestige</div>
+        </div>
+        <div id="header-right">
+            <div id="income-display">⚡ <span id="income-counter">$0/sec</span></div>
+            <button type="button" id="rebirth-btn" class="header-rebirth-btn" onclick="openRebirthModal()" title="Prestige / Rebirth">
+                ✨ Rebirth
+            </button>
+        </div>
     </header>
 
-    <!-- Main game area: harvest panel (left) + shop sidebar (right) -->
+    <!-- Main game area: 3 columns — harvest | upgrades | animals -->
     <div id="game-container">
 
-        <!-- Left: harvest button + rebirth button -->
+        <!-- Left 1/3: click / farm scene -->
         <div id="harvest-panel">
+
+            <!-- Scene background (decorative only) -->
+            <div id="scene">
+                <div id="sun"></div>
+                <div id="moon"></div>
+
+                <!-- Stars -->
+                <div class="star" style="top:8%;left:12%;width:3px;height:3px;animation-delay:0s"></div>
+                <div class="star" style="top:15%;left:28%;width:2px;height:2px;animation-delay:0.8s"></div>
+                <div class="star" style="top:5%;left:55%;width:3px;height:3px;animation-delay:1.4s"></div>
+                <div class="star" style="top:20%;left:70%;width:2px;height:2px;animation-delay:0.3s"></div>
+                <div class="star" style="top:10%;left:82%;width:3px;height:3px;animation-delay:1.9s"></div>
+                <div class="star" style="top:25%;left:42%;width:2px;height:2px;animation-delay:2.2s"></div>
+                <div class="star" style="top:18%;left:6%;width:2px;height:2px;animation-delay:0.6s"></div>
+                <div class="star" style="top:6%;left:38%;width:2px;height:2px;animation-delay:1.1s"></div>
+
+                <!-- Clouds -->
+                <div class="cloud" id="cloud1"></div>
+                <div class="cloud" id="cloud2"></div>
+                <div class="cloud" id="cloud3"></div>
+
+                <!-- Rolling hills (back → front) -->
+                <div class="hill hill-back"></div>
+                <div class="hill hill-mid"></div>
+                <div class="hill hill-front"></div>
+
+            </div>
+
+            <!-- Game UI (above scene) -->
             <div id="harvest-btn-wrapper">
                 <button id="harvest-btn" onclick="handleHarvest(event)">🌾</button>
                 <p id="click-value-display">+$1 / click</p>
             </div>
-            <button id="rebirth-btn" onclick="confirmPrestige()" style="display:none">
-                ✨ Rebirth
-            </button>
+            <div id="stats-bar">
+                <span class="stat-pill">📈 <span id="total-earned-display">$0</span> earned</span>
+                <span class="stat-pill">👆 <span id="click-count-display">0</span> clicks</span>
+            </div>
         </div>
 
-        <!-- Right: scrollable shop sidebar -->
-        <div id="shop-sidebar">
+        <!-- Middle 1/3: passive upgrades + milestones -->
+        <aside id="upgrades-panel" class="shop-panel" aria-label="Upgrades">
             <div class="shop-section">
                 <h2 class="shop-title">🚜 Passive Upgrades</h2>
                 <div id="passive-upgrades-list"></div>
@@ -42,14 +80,47 @@
                 <h2 class="shop-title">🏆 Milestones</h2>
                 <div id="milestone-upgrades-list"></div>
             </div>
-        </div>
+        </aside>
 
+        <!-- Right 1/3: buy animals → your herd → housing -->
+        <aside id="animals-panel" class="shop-panel" aria-label="Animals">
+            <div class="shop-section">
+                <h2 class="shop-title">🛒 Buy animals</h2>
+                <p id="animal-capacity-hint" class="animal-panel-hint"></p>
+                <div id="animal-upgrades-list"></div>
+            </div>
+            <hr class="shop-divider">
+            <div class="shop-section">
+                <h2 class="shop-title">👀 Your herd</h2>
+                <div id="animal-pen-display"></div>
+            </div>
+            <hr class="shop-divider">
+            <div class="shop-section">
+                <h2 class="shop-title">🏠 Housing</h2>
+                <p class="animal-panel-hint">More housing = more animal slots.</p>
+                <div id="animal-housing-list"></div>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- Rebirth info modal (requirements + confirm) -->
+    <div id="rebirth-modal" class="modal-overlay" hidden onclick="if (event.target === this) closeRebirthModal()">
+        <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="rebirth-modal-title" onclick="event.stopPropagation()">
+            <h2 id="rebirth-modal-title" class="modal-title">✨ Rebirth (Prestige)</h2>
+            <div id="rebirth-modal-body" class="modal-body"></div>
+            <div class="modal-actions">
+                <button type="button" class="modal-btn modal-btn-secondary" onclick="closeRebirthModal()">Close</button>
+                <button type="button" id="rebirth-modal-confirm" class="modal-btn modal-btn-primary" style="display:none" onclick="confirmPrestige()">Rebirth now</button>
+            </div>
+        </div>
     </div>
 
     <!-- Scripts loaded in dependency order -->
     <script src="{{ url_for('static', filename='upgrades.js') }}"></script>
     <script src="{{ url_for('static', filename='prestige.js') }}"></script>
     <script src="{{ url_for('static', filename='save.js') }}"></script>
+    <script src="{{ url_for('static', filename='animals.js') }}"></script>
     <script src="{{ url_for('static', filename='game.js') }}"></script>
 
 </body>
