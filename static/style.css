@@ -1,0 +1,223 @@
+/* ── Reset + base ──────────────────────────────────── */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'VT323', monospace;
+    font-size: 20px;
+    background: linear-gradient(160deg, #87ceeb 0%, #b0e0a8 100%);
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* ── Fixed header ─────────────────────────────────── */
+#header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background-color: #4a7c59;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    color: #f0c040;
+    font-size: 28px;
+    border-bottom: 4px solid #5c3d1e;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    z-index: 100;
+}
+
+/* ── Game container ───────────────────────────────── */
+#game-container {
+    display: flex;
+    margin-top: 60px;
+    height: calc(100vh - 60px);
+}
+
+/* ── Harvest panel (left) ─────────────────────────── */
+#harvest-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+#harvest-btn {
+    font-size: 120px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+    user-select: none;
+    transition: filter 0.1s;
+}
+
+#harvest-btn:hover {
+    filter: drop-shadow(0 4px 20px rgba(240,192,64,0.6));
+}
+
+#harvest-btn.bounce {
+    animation: harvest-bounce 0.15s ease;
+}
+
+@keyframes harvest-bounce {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.18); }
+    100% { transform: scale(1); }
+}
+
+#click-value-display {
+    font-size: 22px;
+    color: #5c3d1e;
+    background: #fff8ee;
+    padding: 6px 18px;
+    border-radius: 10px;
+    border: 2px solid #8fbc5a;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* ── Floating +$X text ────────────────────────────── */
+.floating-text {
+    position: fixed;
+    font-family: 'VT323', monospace;
+    font-size: 30px;
+    color: #f0c040;
+    text-shadow: 1px 1px 3px #5c3d1e;
+    pointer-events: none;
+    animation: float-up 1s ease-out forwards;
+    z-index: 999;
+}
+
+@keyframes float-up {
+    0%   { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-80px); }
+}
+
+/* ── Rebirth button ───────────────────────────────── */
+#rebirth-btn {
+    background: linear-gradient(135deg, #9b59b6, #6c3483);
+    color: #f0c040;
+    border: 3px solid #f0c040;
+    padding: 12px 28px;
+    font-family: 'VT323', monospace;
+    font-size: 26px;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    transition: transform 0.15s, background 0.2s;
+}
+
+#rebirth-btn:hover {
+    background: linear-gradient(135deg, #6c3483, #9b59b6);
+    transform: scale(1.06);
+}
+
+/* ── Shop sidebar (right) ─────────────────────────── */
+#shop-sidebar {
+    width: 320px;
+    background-color: #fff8ee;
+    border-left: 4px solid #5c3d1e;
+    overflow-y: auto;
+    padding: 14px 12px;
+    box-shadow: -3px 0 10px rgba(0,0,0,0.15);
+}
+
+.shop-title {
+    font-size: 24px;
+    color: #4a7c59;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #8fbc5a;
+    padding-bottom: 4px;
+}
+
+.shop-divider {
+    border: none;
+    border-top: 3px dashed #8fbc5a;
+    margin: 16px 0;
+}
+
+/* ── Upgrade cards ────────────────────────────────── */
+.upgrade-card {
+    background: #f5f0e8;
+    border: 2px solid #8fbc5a;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2px 8px;
+    transition: transform 0.1s, background 0.15s, box-shadow 0.15s;
+}
+
+.upgrade-card.can-afford:hover {
+    background: #e8f5d0;
+    border-color: #4a7c59;
+    transform: translateX(3px);
+    box-shadow: 0 2px 8px rgba(74,124,89,0.25);
+}
+
+.upgrade-card.can-afford {
+    box-shadow: 0 0 8px rgba(143,188,90,0.4);
+}
+
+.upgrade-card.cant-afford {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.upgrade-card.locked {
+    background: #e0d8cc;
+    border-color: #bbb;
+    opacity: 0.55;
+    cursor: not-allowed;
+    filter: grayscale(40%);
+}
+
+.upgrade-card.purchased {
+    background: #d4edda;
+    border-color: #4a7c59;
+    cursor: default;
+}
+
+.upgrade-name {
+    font-size: 19px;
+    color: #5c3d1e;
+}
+
+.upgrade-level {
+    font-size: 17px;
+    color: #4a7c59;
+    text-align: right;
+}
+
+.upgrade-cost {
+    font-size: 18px;
+    color: #c8860a;
+}
+
+.upgrade-rate {
+    font-size: 16px;
+    color: #888;
+    text-align: right;
+}
+
+.upgrade-requirement {
+    font-size: 15px;
+    color: #999;
+    grid-column: 1 / -1;
+    font-style: italic;
+}
+
+.upgrade-effect {
+    font-size: 15px;
+    color: #4a7c59;
+    grid-column: 1 / -1;
+}
